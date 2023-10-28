@@ -33,7 +33,7 @@
             </v-col>
             <v-col cols="12" xs="3" sm="3" md="3" lg="3">
               <v-select
-                :items="[{ text: '25', value: 0}, { text: '30', value: 1}]"
+                :items="lnValues"
                 v-model="ln"
                 label="Ln (M.)"
                 outlined
@@ -41,7 +41,7 @@
             </v-col>
             <v-col cols="12" xs="3" sm="3" md="3" lg="3">
               <v-select
-                :items="[{ text: '12', value: 0}, { text: '15', value: 1}]"
+                :items="wValues"
                 v-model="w"
                 label="W (M.)"
                 outlined
@@ -49,7 +49,7 @@
             </v-col>
             <v-col cols="12" xs="3" sm="3" md="3" lg="3">
               <v-select
-                :items="[{ text: '0', value: 1 }, { text: '5', value: 1.0038 }, { text: '10', value: 1.0154 }, { text: '15', value: 1.0353 }, { text: '20', value: 1.0642 }, { text: '25', value: 1.1034 }, { text: '30', value: 1.1547 }, { text: '35', value: 1.2208 }, { text: '40', value: 1.3054 }, { text: '45', value: 1.4142 }]"
+                :items="skewValues"
                 v-model="skew"
                 label="SKEW"
                 outlined
@@ -57,6 +57,11 @@
             </v-col>
             <v-col cols="12"  xs="1" sm="1" md="1" lg="1">
               <p>SHEET NO. 7</p>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" class="d-flex justify-end">
+              <v-btn color="green darken-4" @click="exportToExcel" dark>EXPORT to Excel</v-btn>
             </v-col>
           </v-row>
           <v-row>
@@ -307,13 +312,16 @@
 
 <script>
 import moment from 'moment-timezone'
-
+import XLSX from 'xlsx'
 export default {
   name: 'HomeView',
   data: () => ({
     toDay: moment().tz('Asia/Bangkok').locale('th').format('DD MMMM YYYY'),
     valid: false,
     pricePerUnits: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    lnValues: [{ text: '25', value: 0 }, { text: '30', value: 1 }],
+    wValues: [{ text: '12', value: 0 }, { text: '15', value: 1 }],
+    skewValues: [{ text: '0', value: 1 }, { text: '5', value: 1.0038 }, { text: '10', value: 1.0154 }, { text: '15', value: 1.0353 }, { text: '20', value: 1.0642 }, { text: '25', value: 1.1034 }, { text: '30', value: 1.1547 }, { text: '35', value: 1.2208 }, { text: '40', value: 1.3054 }, { text: '45', value: 1.4142 }],
     ln: 0,
     w: 0,
     skew: 1,
@@ -349,6 +357,219 @@ export default {
       } else {
         this.$refs.form.inputs[0].focus()
       }
+    },
+    exportToExcel () {
+      // eslint-disable-next-line quotes
+      const table = `
+      <table border="1" cellspacing="0" cellpadding="3">
+          <tbody>
+              <tr>
+                  <td colspan="6">รายการคำนวณปริมาณวัตถุ</td>
+                  <td>แผ่นที่ 1/1</td>
+              </tr>
+              <tr>
+                  <td colspan="6">โครงการ:</td>
+                  <td>UPDATE</td>
+              </tr>
+              <tr>
+                  <td colspan="6">อ้างถึงแบบมาตรฐานเลขที่ PC-304</td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td colspan="3">ABUTMENT WITHOUT SIDEWALK</td>
+                  <td>Ln (M.)</td>
+                  <td>W (M.)</td>
+                  <td>SKEW</td>
+                  <td>SHEET NO. 7</td>
+              </tr>
+              <tr>
+                  <td colspan="3"></td>
+                  <td>${this.lnValues[this.ln].text}</td>
+                  <td>${this.wValues[this.w].text}</td>
+                  <td>${this.skewValues.find(v => {
+                    return v.value === this.skew
+                  }).text}</td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>ลำดับ</td>
+                  <td>รายการวัสดุ</td>
+                  <td>ปริมาณ</td>
+                  <td>หน่วย</td>
+                  <td>หมายเหตุ</td>
+                  <td>ราคาต่อหน่วย</td>
+                  <td>สรุปราคา</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>ฐานราก</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>- เสาเข็ม 0.525x0.525 ม. SAFETY LOAD 50 TON/PILE</td>
+                <td></td>
+                <td>ต้น</td>
+                <td></td>
+                <td>${this.pricePerUnits[0]}</td>
+                <td data-t="s">${this.numberFormatter((this.footingt38[this.ln][this.w] * this.pricePerUnits[0]))}</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>- ปริมาณคอนกรีตหยาบ</td>
+                <td></td>
+                <td>ลบม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[1]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcLeanConcrete * this.pricePerUnits[1]))}</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>- ปริมาณทรายบดอัด</td>
+                <td></td>
+                <td>ลบม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[2]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcCompactSand * this.pricePerUnits[2]))}</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>- ไม้แบบ</td>
+                <td></td>
+                <td>ตรม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[3]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcFormWork * this.pricePerUnits[3]))}</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>- คอนกรีต Strength 35 Mpa.</td>
+                <td></td>
+                <td>ลบม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[4]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcConcrete35 * this.pricePerUnits[4]))}</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>- เหล็กเสริม</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>- DB20</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[5]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcDB20 * this.pricePerUnits[5]))}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>- DB25</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[6]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcDB25 * this.pricePerUnits[6]))}</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>- ลวดผูกเหล็ก</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[7]}</td>
+                <td data-t="s">${this.numberFormatter((((this.calcDB20 + this.calcDB25) * 0.025) * this.pricePerUnits[7]))}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>ABUTMENT</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>- ไม้แบบ</td>
+                <td></td>
+                <td>ตรม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[8]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcFormWork2 * this.pricePerUnits[8]))}</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>- คอนกรีต Strength 35 Mpa.</td>
+                <td></td>
+                <td>ลบม.</td>
+                <td></td>
+                <td>${this.pricePerUnits[9]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcConcrete352 * this.pricePerUnits[9]))}</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>- เหล็กเสริม</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>- DB12</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[10]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcDB12 * this.pricePerUnits[10]))}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>- DB16</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[11]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcDB16 * this.pricePerUnits[11]))}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>- DB20</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[12]}</td>
+                <td data-t="s">${this.numberFormatter((this.calcDB202 * this.pricePerUnits[12]))}</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>- ลวดผูกเหล็ก</td>
+                <td></td>
+                <td>กก.</td>
+                <td></td>
+                <td>${this.pricePerUnits[13]}</td>
+                <td data-t="s">${this.numberFormatter((((this.calcDB12 + this.calcDB16 + this.calcDB202) * 0.025) * this.pricePerUnits[13]))}</td>
+            </tr>
+            <tr>
+                <td colspan="6">รวมเป็นราคา</td>
+                <td data-t="s">${this.numberFormatter((this.footingt38[this.ln][this.w] * this.pricePerUnits[0]) + (this.calcLeanConcrete * this.pricePerUnits[1]) + (this.calcCompactSand * this.pricePerUnits[2]) + (this.calcFormWork * this.pricePerUnits[3]) + (this.calcConcrete35 * this.pricePerUnits[4]) + (this.calcDB20 * this.pricePerUnits[5]) + (this.calcDB25 * this.pricePerUnits[6]) + (((this.calcDB20 + this.calcDB25) * 0.025) * this.pricePerUnits[7]) + (this.calcFormWork2 * this.pricePerUnits[8]) + (this.calcConcrete352 * this.pricePerUnits[9]) + (this.calcDB12 * this.pricePerUnits[10]) + (this.calcDB16 * this.pricePerUnits[11]) + (this.calcDB202 * this.pricePerUnits[12]) + (((this.calcDB12 + this.calcDB16 + this.calcDB202) * 0.025) * this.pricePerUnits[13]))}</td>
+            </tr>
+          </tbody>
+      </table>`
+      const wb = XLSX.read(table, { type: 'string' })
+      XLSX.writeFile(wb, 'PC-304.xlsx', { raw: true })
     }
   },
   computed: {
@@ -426,7 +647,7 @@ export default {
       return (n37 + v27)
     },
     calcConcrete352: function () {
-      const skewNum = [{ text: '0', value: 1 }, { text: '5', value: 1.0038 }, { text: '10', value: 1.0154 }, { text: '15', value: 1.0353 }, { text: '20', value: 1.0642 }, { text: '25', value: 1.1034 }, { text: '30', value: 1.1547 }, { text: '35', value: 1.2208 }, { text: '40', value: 1.3054 }, { text: '45', value: 1.4142 }].find(v => {
+      const skewNum = this.skewValues.find(v => {
         return v.value === this.skew
       })
       const n18 = (0.120 * (this.w2Exp[this.w] * this.skew))
