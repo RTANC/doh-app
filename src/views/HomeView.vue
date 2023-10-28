@@ -281,7 +281,7 @@
                     <tr>
                       <td colspan="5"></td>
                       <td class="text-right">รวมเป็นราคา</td>
-                      <td class="text-right"></td>
+                      <td class="text-right text-decoration-underline text-black font-weight-black">{{ numberFormatter((footingt38[ln][w] * pricePerUnits[0]) + (calcLeanConcrete * pricePerUnits[1]) + (calcCompactSand * pricePerUnits[2]) + (calcFormWork * pricePerUnits[3]) + (calcConcrete35 * pricePerUnits[4]) + (calcDB20 * pricePerUnits[5]) + (calcDB25 * pricePerUnits[6]) + (((calcDB20 + calcDB25) * 0.025) * pricePerUnits[7]) + (calcFormWork2 * pricePerUnits[8]) + (calcConcrete352 * pricePerUnits[9]) + (calcDB12 * pricePerUnits[10]) + (calcDB16 * pricePerUnits[11]) + (calcDB202 * pricePerUnits[12]) + (((calcDB12 + calcDB16 + calcDB202) * 0.025) * pricePerUnits[13])) }}</td>
                     </tr>
                   </tfoot>
                 </template>
