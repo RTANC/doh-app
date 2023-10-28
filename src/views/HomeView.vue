@@ -60,8 +60,14 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" class="d-flex justify-end">
-              <v-btn color="green darken-4" @click="exportToExcel" dark>EXPORT to Excel</v-btn>
+            <v-col cols="12" xs="6" sm="6" md="8" lg="8">
+              <input ref="file" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" @change="handleFileUpload" v-show="false">
+            </v-col>
+            <v-col cols="12" xs="3" sm="3" md="2" lg="2" class="d-flex justify-end">
+              <v-btn color="info" @click="uploadExcel" dark> <v-icon left>mdi-upload</v-icon> Upload Excel</v-btn>
+            </v-col>
+            <v-col cols="12" xs="3" sm="3" md="2" lg="2" class="d-flex justify-end">
+              <v-btn color="green darken-4" @click="exportToExcel" dark><v-icon left>mdi-download</v-icon> EXPORT to Excel</v-btn>
             </v-col>
           </v-row>
           <v-row>
@@ -356,6 +362,39 @@ export default {
         this.$refs.form.inputs[index + 1].focus()
       } else {
         this.$refs.form.inputs[0].focus()
+      }
+    },
+    uploadExcel () {
+      this.$refs.file.click()
+    },
+    async handleFileUpload (e) {
+      try {
+        const wb = XLSX.read(await e.target.files[0].arrayBuffer(), { cellNF: true })
+        const ws = wb.Sheets[wb.SheetNames[0]]
+        if (!ws || !ws['!ref']) return
+        // const ref = XLSX.utils.decode_range(ws['!ref'])
+        // const addr = XLSX.utils.encode_cell({r:R, c:0 })
+        this.ln = this.lnValues.findIndex(v => {
+          // eslint-disable-next-line
+          return v.text == ws['D5'].v
+        })
+
+        this.w = this.wValues.findIndex(v => {
+          // eslint-disable-next-line
+          return v.text == ws['E5'].v
+        })
+
+        this.skew = this.skewValues.find(v => {
+          // eslint-disable-next-line
+          return v.text == ws['F5'].v
+        }).value
+        // eslint-disable-next-line
+        const cells = ['F8', 'F9', 'F10', 'F11', 'F12', 'F14', 'F15', 'F16', 'F18', 'F19', 'F21', 'F22', 'F23', 'F24']
+        for (let i = 0; i < cells.length; i++) {
+          this.pricePerUnits[i] = parseInt(ws[cells[i]].v)
+        }
+      } catch (error) {
+        console.log(error)
       }
     },
     exportToExcel () {
