@@ -33,7 +33,7 @@
           </v-list-item>
           <v-list-item :to="{ path: '/about' }" @click.stop="drawer = false">
             <v-list-item-content>
-              <v-list-item-title>เกี่ยวกับ</v-list-item-title>
+              <v-list-item-title>ASPHALT CONCRETE LEVELING COURSE</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
