@@ -192,7 +192,7 @@
 <script>
 import XLSX from 'xlsx'
 export default {
-  name: 'AboutView',
+  name: 'AsphaltConcreteLevelingView',
   data: () => ({
     valid: false,
     asphaltConcrete: 0,

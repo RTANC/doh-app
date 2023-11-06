@@ -31,9 +31,14 @@
               <v-list-item-title>หน้าแรก</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item :to="{ path: '/about' }" @click.stop="drawer = false">
+          <v-list-item :to="{ path: '/AsphaltConcreteLeveling' }" @click.stop="drawer = false">
             <v-list-item-content>
               <v-list-item-title>ASPHALT CONCRETE LEVELING COURSE</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item :to="{ path: '/SoftMaterialExcavation' }" @click.stop="drawer = false">
+            <v-list-item-content>
+              <v-list-item-title>Soft Material Excavation (Excavation Only)</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
