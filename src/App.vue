@@ -41,6 +41,26 @@
               <v-list-item-title>Soft Material Excavation (Excavation Only)</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item :to="{ path: '/SoilAggregateSubbase' }" @click.stop="drawer = false">
+            <v-list-item-content>
+              <v-list-item-title>Soil Aggregate Subbase</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item :to="{ path: '/CrushedRockSoilAggregateTypeBase' }" @click.stop="drawer = false">
+            <v-list-item-content>
+              <v-list-item-title>Crushed Rock Soil Aggregate Type Base</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item :to="{ path: '/MillingOfExistingAsphaltSurface' }" @click.stop="drawer = false">
+            <v-list-item-content>
+              <v-list-item-title>Milling Of Existing Asphalt Surface</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item :to="{ path: '/MillingOfExistingAsphaltSurface10' }" @click.stop="drawer = false">
+            <v-list-item-content>
+              <v-list-item-title>Milling Of Existing Asphalt Surface</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>

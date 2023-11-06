@@ -18,6 +18,26 @@ const routes = [
     path: '/SoftMaterialExcavation',
     name: 'SoftMaterialExcavationView',
     component: () => import('@/views/SoftMaterialExcavationView.vue')
+  },
+  {
+    path: '/SoilAggregateSubbase',
+    name: 'SoilAggregateSubbaseView',
+    component: () => import('@/views/SoilAggregateSubbaseView.vue')
+  },
+  {
+    path: '/CrushedRockSoilAggregateTypeBase',
+    name: 'CrushedRockSoilAggregateTypeBaseView',
+    component: () => import('@/views/CrushedRockSoilAggregateTypeBaseView.vue')
+  },
+  {
+    path: '/MillingOfExistingAsphaltSurface',
+    name: 'MillingOfExistingAsphaltSurfaceView',
+    component: () => import('@/views/MillingOfExistingAsphaltSurfaceView.vue')
+  },
+  {
+    path: '/MillingOfExistingAsphaltSurface10',
+    name: 'MillingOfExistingAsphaltSurface10View',
+    component: () => import('@/views/MillingOfExistingAsphaltSurface10View.vue')
   }
 ]
 
